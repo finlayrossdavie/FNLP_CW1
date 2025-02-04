@@ -50,11 +50,19 @@ class CountFeatureExtractor(FeatureExtractor):
         Depending on your implementation, you may also want to explicitly handle cases of unseen tokens:
         Output: Counter({0: 2, 1: 1, 2: 0})
         (In the above case, the token "foo" is not in the text, so its count is 0.)
-        """
-        token_ids = [self.tokenizer.token_to_id.get(token, -1) for token in text]
         
-        return Counter(token_ids)
-     
+        """
+
+        tokenized_text = self.tokenizer.tokenize(text, False)
+
+        token_ids = [self.tokenizer.token_to_id.get(token) for token in tokenized_text if token in self.tokenizer.token_to_id]
+
+        #print("Token IDs:", token_ids)
+        counter = Counter(token_ids)
+    
+  
+
+        return counter
 
 
 class CustomFeatureExtractor(FeatureExtractor):
@@ -236,6 +244,15 @@ class LogisticRegressionClassifier(SentimentClassifier):
         set `self.weights`: [-1.5, 1.25, 1.75]
         set `self.bias`: -0.25
         """
+
+        for example in batch_exs:
+            example_features = self.featurizer.extract_features(example.words)
+            example_prediction = self.predict(example.words)
+
+
+
+
+
         raise Exception("TODO: Implement this method")
 
 
