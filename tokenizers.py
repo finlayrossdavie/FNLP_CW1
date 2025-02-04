@@ -149,10 +149,7 @@ class NgramTokenizer(Tokenizer):
         self.id_to_token = {i: token for token, i in self.token_to_id.items()}
 
 
-        def __len__(self):
-            """
-            TODO: Return the number of tokens in the vocabulary.
-            """
+    def __len__(self):
             return len(self.token_to_id)
 
 if __name__ == "__main__":

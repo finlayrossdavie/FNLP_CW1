@@ -54,14 +54,10 @@ class CountFeatureExtractor(FeatureExtractor):
         """
 
         tokenized_text = self.tokenizer.tokenize(text, False)
-
         token_ids = [self.tokenizer.token_to_id.get(token) for token in tokenized_text if token in self.tokenizer.token_to_id]
 
-        #print("Token IDs:", token_ids)
         counter = Counter(token_ids)
     
-  
-
         return counter
 
 
