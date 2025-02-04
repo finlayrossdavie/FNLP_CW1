@@ -1,5 +1,6 @@
 # models.py
 
+import math
 from utils import SentimentExample
 from typing import List
 from collections import Counter
@@ -240,16 +241,35 @@ class LogisticRegressionClassifier(SentimentClassifier):
         set `self.weights`: [-1.5, 1.25, 1.75]
         set `self.bias`: -0.25
         """
+        total_weight_updates = np.zeros_like(self.weights)
+        total_bias_update = 0.0
+        batch_size = len(batch_exs)
 
         for example in batch_exs:
+            y = example.label
             example_features = self.featurizer.extract_features(example.words)
-            example_prediction = self.predict(example.words)
+            y_hat = self.predict(example.words)
 
+            # Calculate the error (difference between prediction and actual label)
 
+            #Using cross-entropy loss as defined in book
+            #L(y^, y) = -[ylogy^ + (1-y)log(1-y^)]
 
+            #loss = -(y*math.log(y_hat) + (1-y)*math.log(1-y_hat))
 
+            error = y - y_hat
 
-        raise Exception("TODO: Implement this method")
+            # Update weights and bias
+            for feature, count in example_features.items():
+                if feature < len(self.weights):
+                    total_weight_updates[feature] += error * count
+
+            total_bias_update += error
+
+        # Apply the updates to weights and bias
+        self.weights += (learning_rate / batch_size) * total_weight_updates
+        self.bias += (learning_rate / batch_size) * total_bias_update
+        
 
 
 def get_accuracy(predictions: List[int], labels: List[int]) -> float:
