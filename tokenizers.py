@@ -148,7 +148,7 @@ class NgramTokenizer(Tokenizer):
         self.token_to_id = {token: i for i, (token, _) in enumerate(sorted_tokens)}
         self.id_to_token = {i: token for token, i in self.token_to_id.items()}
 
-        
+
         def __len__(self):
             """
             TODO: Return the number of tokens in the vocabulary.
@@ -168,6 +168,7 @@ if __name__ == "__main__":
 
     ngram = NgramTokenizer(n=2)
     ngram.train(corpus)
+
 
     sample_text = "I love scifi and am willing to put up with a lot. Scifi movies and TV are usually underfunded, under-appreciated and misunderstood."
 

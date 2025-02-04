@@ -51,7 +51,10 @@ class CountFeatureExtractor(FeatureExtractor):
         Output: Counter({0: 2, 1: 1, 2: 0})
         (In the above case, the token "foo" is not in the text, so its count is 0.)
         """
-        raise Exception("TODO: Implement this method")
+        token_ids = [self.tokenizer.token_to_id.get(token, -1) for token in text]
+        
+        return Counter(token_ids)
+     
 
 
 class CustomFeatureExtractor(FeatureExtractor):
