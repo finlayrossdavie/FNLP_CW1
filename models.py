@@ -250,7 +250,6 @@ class LogisticRegressionClassifier(SentimentClassifier):
             example_features = self.featurizer.extract_features(example.words)
             y_hat = self.predict(example.words)
 
-            # Calculate the error (difference between prediction and actual label)
 
             #Using cross-entropy loss as defined in book
             #L(y^, y) = -[ylogy^ + (1-y)log(1-y^)]
@@ -315,7 +314,18 @@ def train_logistic_regression(
     # Initialize the model and
     # any other variables you want to keep track of
     ##########################################
-    raise Exception("TODO: Implement this section")
+
+    model = LogisticRegressionClassifier(feat_extractor)
+
+    for epoch in epochs:
+        np.random.shuffle(train_exs)
+
+        epoch_data = train_exs[:batch_size]
+        model.training_step(epoch_data,learning_rate)
+    
+
+    return model
+
 
     ##########################################
     # Learning rate scheduler
