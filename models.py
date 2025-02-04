@@ -184,7 +184,19 @@ class LogisticRegressionClassifier(SentimentClassifier):
         sigmoid_score = sigmoid(5) = 0.993...
         Output: 1
         """
-        raise Exception("TODO: Implement this method")
+
+        features = self.featurizer.extract_features(text)
+
+        score = self.bias
+
+        for feature, count in features.items():
+            if feature < len(self.weights):
+                score += count * self.weights[feature]
+
+
+        sigmoid_score = sigmoid(score)
+
+        return 1 if sigmoid_score >= 0.5 else 0
 
     def set_weights(self, weights: np.ndarray):
         """
