@@ -53,6 +53,7 @@ class CountFeatureExtractor(FeatureExtractor):
         (In the above case, the token "foo" is not in the text, so its count is 0.)
         
         """
+    
 
         tokenized_text = self.tokenizer.tokenize(text, False)
         token_ids = [self.tokenizer.token_to_id.get(token) for token in tokenized_text if token in self.tokenizer.token_to_id]
@@ -247,27 +248,23 @@ class LogisticRegressionClassifier(SentimentClassifier):
 
         for example in batch_exs:
             y = example.label
-            example_features = self.featurizer.extract_features(example.words)
-            y_hat = self.predict(example.words)
+            features = self.featurizer.extract_features(example.words)
+            score = self.bias + sum(self.weights[f] * features[f] for f in features if f < len(self.weights))
+            y_hat = sigmoid(score)
 
-
-            #Using cross-entropy loss as defined in book
-            #L(y^, y) = -[ylogy^ + (1-y)log(1-y^)]
-
-            #loss = -(y*math.log(y_hat) + (1-y)*math.log(1-y_hat))
-
-            error = y - y_hat
-
-            # Update weights and bias
-            for feature, count in example_features.items():
+            error = y - y_hat  # Gradient of loss function
+            
+            for feature, count in features.items():
                 if feature < len(self.weights):
-                    total_weight_updates[feature] += error * count
+                    self.weights[feature] += learning_rate * error * count
 
-            total_bias_update += error
+            self.bias += learning_rate * error  # Update bias
 
-        # Apply the updates to weights and bias
-        self.weights += (learning_rate / batch_size) * total_weight_updates
-        self.bias += (learning_rate / batch_size) * total_bias_update
+        #Using cross-entropy loss as defined in book
+        #L(y^, y) = -[ylogy^ + (1-y)log(1-y^)]
+
+        #loss = -(y*math.log(y_hat) + (1-y)*math.log(1-y_hat))
+   
         
 
 
@@ -320,11 +317,12 @@ def train_logistic_regression(
     for epoch in range(epochs):
         np.random.shuffle(train_exs)
 
-        batch_data = train_exs[:batch_size]
-        model.training_step(batch_data, learning_rate)
+        for i in range(0, len(train_exs), batch_size):
+            batch_data = train_exs[i : i + batch_size]
+            model.training_step(batch_data, learning_rate)
 
-        predictions = run_model_over_dataset(model, dev_exs)
-        accuracy = get_accuracy(predictions, [ex.label for ex in dev_exs])
+        #predictions = run_model_over_dataset(model, dev_exs)
+        #accuracy = get_accuracy(predictions, [ex.label for ex in dev_exs])
     
 
     return model
