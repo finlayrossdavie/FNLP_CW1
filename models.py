@@ -317,11 +317,14 @@ def train_logistic_regression(
 
     model = LogisticRegressionClassifier(feat_extractor)
 
-    for epoch in epochs:
+    for epoch in range(epochs):
         np.random.shuffle(train_exs)
 
-        epoch_data = train_exs[:batch_size]
-        model.training_step(epoch_data,learning_rate)
+        batch_data = train_exs[:batch_size]
+        model.training_step(batch_data, learning_rate)
+
+        predictions = run_model_over_dataset(model, dev_exs)
+        accuracy = get_accuracy(predictions, [ex.label for ex in dev_exs])
     
 
     return model
