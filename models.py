@@ -79,7 +79,23 @@ class CustomFeatureExtractor(FeatureExtractor):
         TODO: Implement your own custom feature extractor. The returned format should be the same as in CountFeatureExtractor,
         a Counter mapping from feature ids to their values.
         """
-        raise Exception("TODO: Implement this method")
+
+        
+        tokenized_text = self.tokenizer.tokenize(text, False)
+        token_ids = [self.tokenizer.token_to_id.get(token) for token in tokenized_text if token in self.tokenizer.token_to_id]
+
+        total = len(token_ids)
+        
+        counter = Counter(token_ids)
+
+        term_freq = dict()
+        for key in counter:
+            term_freq[key] = math.log(1 + counter[key])
+               
+        
+    
+        return counter
+
 
 
 class MeanPoolingWordVectorFeatureExtractor(FeatureExtractor):
@@ -323,7 +339,6 @@ def train_logistic_regression(
 
         #predictions = run_model_over_dataset(model, dev_exs)
         #accuracy = get_accuracy(predictions, [ex.label for ex in dev_exs])
-    
 
     return model
 
