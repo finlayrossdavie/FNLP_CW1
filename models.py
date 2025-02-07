@@ -67,7 +67,6 @@ class CustomFeatureExtractor(FeatureExtractor):
     """
     Custom feature extractor that extracts features from a text using a custom tokenizer.
     """
-
     def __init__(self, tokenizer: Tokenizer):
         self.tokenizer = tokenizer
 
@@ -80,7 +79,6 @@ class CustomFeatureExtractor(FeatureExtractor):
         a Counter mapping from feature ids to their values.
         """
 
-        
         tokenized_text = self.tokenizer.tokenize(text, False)
         token_ids = [self.tokenizer.token_to_id.get(token) for token in tokenized_text if token in self.tokenizer.token_to_id]
 
@@ -92,11 +90,7 @@ class CustomFeatureExtractor(FeatureExtractor):
         for key in counter:
             term_freq[key] = math.log(1 + counter[key])
                
-        
-    
         return counter
-
-
 
 class MeanPoolingWordVectorFeatureExtractor(FeatureExtractor):
     def __init__(self, tokenizer: Tokenizer):
@@ -119,7 +113,13 @@ class MeanPoolingWordVectorFeatureExtractor(FeatureExtractor):
         Input `word`: "328hdnsr32ion"
         Output: None
         """
-        raise Exception("TODO: Implement this method")
+
+        try:
+            print(word)
+            return self.word_to_vector_model.get_vector(word)
+        except:
+            return None
+        
 
     def extract_features(self, text: List[str]) -> Counter:
         """
@@ -133,7 +133,20 @@ class MeanPoolingWordVectorFeatureExtractor(FeatureExtractor):
         from token ids to their counts, normally you would not need to do this conversion.
         Remember to ignore words that do not have a word vector.
         """
-        raise Exception("TODO: Implement this method")
+        
+        tokenized_text = self.tokenizer.tokenize(text, False)
+        word_vectors = [self.get_word_vector(token) for token in tokenized_text if self.get_word_vector(token) is not None]
+        mean_pooling_vector = np.mean(word_vectors, axis=0)
+
+        print(mean_pooling_vector)
+        
+        
+        counter = Counter(mean_pooling_vector)
+
+        print(counter)
+
+        return counter
+    
 
 
 class SentimentClassifier(object):
