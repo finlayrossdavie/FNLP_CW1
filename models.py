@@ -113,10 +113,9 @@ class MeanPoolingWordVectorFeatureExtractor(FeatureExtractor):
         Input `word`: "328hdnsr32ion"
         Output: None
         """
-
+        
         try:
-            print(word)
-            return self.word_to_vector_model.get_vector(word)
+            return self.word_to_vector_model[word]
         except:
             return None
         
@@ -133,18 +132,19 @@ class MeanPoolingWordVectorFeatureExtractor(FeatureExtractor):
         from token ids to their counts, normally you would not need to do this conversion.
         Remember to ignore words that do not have a word vector.
         """
-        
+    
         tokenized_text = self.tokenizer.tokenize(text, False)
         word_vectors = [self.get_word_vector(token) for token in tokenized_text if self.get_word_vector(token) is not None]
-        mean_pooling_vector = np.mean(word_vectors, axis=0)
+        print(word_vectors)
+        mean_pooling_vector = np.mean(word_vectors, axis=1)
 
-        print(mean_pooling_vector)
+        print("Real word", self.get_word_vector("hello"), "\n")
+        print("false word: ", self.get_word_vector("hifijsfgndfj"))
         
         
         counter = Counter(mean_pooling_vector)
 
-        print(counter)
-
+       
         return counter
     
 
@@ -228,7 +228,6 @@ class LogisticRegressionClassifier(SentimentClassifier):
             if feature < len(self.weights):
                 score += count * self.weights[feature]
 
-
         sigmoid_score = sigmoid(score)
 
         return 1 if sigmoid_score >= 0.5 else 0
@@ -275,19 +274,28 @@ class LogisticRegressionClassifier(SentimentClassifier):
         total_bias_update = 0.0
         batch_size = len(batch_exs)
 
-        for example in batch_exs:
-            y = example.label
-            features = self.featurizer.extract_features(example.words)
-            score = self.bias + sum(self.weights[f] * features[f] for f in features if f < len(self.weights))
-            y_hat = sigmoid(score)
+        bias_update = 0.0  
 
+        for example in batch_exs:
+            y = example.label  # True label
+            features = self.featurizer.extract_features(example.words)
+
+            y_hat = self.predict(example.words)
+  
             error = y - y_hat  # Gradient of loss function
             
+         
             for feature, count in features.items():
                 if feature < len(self.weights):
-                    self.weights[feature] += learning_rate * error * count
+                    total_weight_updates[feature] += error * count  
 
-            self.bias += learning_rate * error  # Update bias
+          
+            bias_update += error  
+
+        self.weights += (learning_rate / batch_size) * total_weight_updates
+        self.bias += (learning_rate / batch_size) * bias_update
+
+    
 
         #Using cross-entropy loss as defined in book
         #L(y^, y) = -[ylogy^ + (1-y)log(1-y^)]
