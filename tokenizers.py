@@ -29,14 +29,14 @@ class Tokenizer(object):
         self.id_to_token = {} # map from a unique integer id to a token (e.g. 1 -> 'the')
 
     def tokenize(self, text: str, return_token_ids: bool = False):
-        return NgramTokenizer(self, text, return_token_ids).tokenize
-                
+        raise Exception("tokenize not implemented")
 
     def train(self, corpus: List[str]):
-        return NgramTokenizer(self, corpus).train
+        raise Exception("train not implemented")
 
     def __len__(self):
-        return NgramTokenizer(self).__len__
+        raise Exception("__len__ not implemented")
+
 
 
 class ReturnWordsTokenizer(Tokenizer):
@@ -44,6 +44,8 @@ class ReturnWordsTokenizer(Tokenizer):
         return convert_text_to_words(text)
     def train(self, corpus: List[str]):
         pass
+    def __len__(self):
+        return 1
 
 class NgramTokenizer(Tokenizer):
     def __init__(self, n: int = 2, vocab_size: int = -1, *args, **kwargs):

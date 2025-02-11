@@ -134,17 +134,16 @@ class MeanPoolingWordVectorFeatureExtractor(FeatureExtractor):
         """
     
         tokenized_text = self.tokenizer.tokenize(text, False)
+        
+        #print("Tokenized text", tokenized_text)
         word_vectors = [self.get_word_vector(token) for token in tokenized_text if self.get_word_vector(token) is not None]
-        print(word_vectors)
-        mean_pooling_vector = np.mean(word_vectors, axis=1)
+        mean_pooling_vector = np.mean(word_vectors, axis=0)
 
-        print("Real word", self.get_word_vector("hello"), "\n")
-        print("false word: ", self.get_word_vector("hifijsfgndfj"))
+        #print("Mean pooling vector:", mean_pooling_vector)
+        #vector_dict = {i: val for i, val in enumerate(mean_pooling_vector)}
+  
+        counter = Counter({i: mean_pooling_vector[i] for i in range(len(mean_pooling_vector))})
         
-        
-        counter = Counter(mean_pooling_vector)
-
-       
         return counter
     
 
@@ -280,12 +279,18 @@ class LogisticRegressionClassifier(SentimentClassifier):
             y = example.label  # True label
             features = self.featurizer.extract_features(example.words)
 
+            #print(type(features))
+            #print(type(features[1]))
+            #print(features[1])
+           
+
             y_hat = self.predict(example.words)
   
             error = y - y_hat  # Gradient of loss function
             
          
             for feature, count in features.items():
+               
                 if feature < len(self.weights):
                     total_weight_updates[feature] += error * count  
 

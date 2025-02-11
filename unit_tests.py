@@ -255,9 +255,11 @@ class MeanPoolingWordVectorFeatureExtractorTest(unittest.TestCase):
             
         with open("mean_pooling_feature_extractor_unittest_sol.pkl", "rb") as f:
             correct_features = pickle.load(f)
-        
+
+
         # check each individual feature that it's close to the correct feature (some floating point error)
         for i in range(len(features)):
+        
             self.assertTrue(np.isclose(features[i], correct_features[i]))
         
     def test_lr_with_mean_pooling(self):
